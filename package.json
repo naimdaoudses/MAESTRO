@@ -1,0 +1,35 @@
+{
+  "name": "factura-manager",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sap-cloud-sdk/http-client": "^4.6.0",
+    "@sap-cloud-sdk/resilience": "^4.6.0",
+    "@sap/cds": "^9"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4",
+    "cds-plugin-ui5": "^0.13.0"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-facturas_ui": "cds watch --open facturas_ui/webapp/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "private": true,
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/facturas_ui"
+  ],
+  "cds": {
+    "requires": {
+      "BPA_Service": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "sap_process_automation_service",
+          "requestTimeout": 30000
+        }
+      }
+    }
+  }
+}
