@@ -1,0 +1,8 @@
+### Disparar proceso de BPA
+POST http://localhost:4004/srv/dispararProceso
+Content-Type: application/json
+
+{
+    "nombre": "factura_enero.pdf",
+    "monto": "base64_del_archivo_aqui"
+}

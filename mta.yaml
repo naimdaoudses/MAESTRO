@@ -1,0 +1,31 @@
+_schema-version: '3.1'
+ID: MAESTRO
+version: 1.0.0
+description: "Proyecto Maestro conectado a SAP BPA"
+parameters:
+  enable-parallel-deployments: true
+
+modules:
+  # El backend de tu aplicación (carpeta srv)
+  - name: MAESTRO-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: MAESTRO-db
+      - name: bpa_service # <-- Aquí "pides" el acceso a BPA
+
+resources:
+  # Este recurso crea la base de datos HANA
+  - name: MAESTRO-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+      resource-name: eze
+
+  # Este recurso crea la conexión con SAP Build Process Automation
+  - name: bpa_service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: process-automation-service
+      service-plan: standard

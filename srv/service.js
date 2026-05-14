@@ -1,29 +1,23 @@
 const cds = require('@sap/cds');
 
 module.exports = cds.service.impl(async function() {
-    const { Facturas } = this.entities;
+    const bpa = await cds.connect.to('SAP_BPA');
 
-    this.after('CREATE', 'Facturas', async (data, req) => {
+    this.on('dispararProceso', async (req) => {
         try {
-            const bpa = await cds.connect.to('BPA_Service');
-
-            const payload = {
-                // AQUÍ PEGA EL ID QUE COPIASTE DEL MONITOR
-                definitionId: "us10.sap-probando.smartinvoice.invoiceProccess", 
+            const respuesta = await bpa.send('POST', '/workflow-service/rest/v1/workflow-instances', {
+                definitionId: "us10.sap-probando.smartinvoice.invoiceProccess",
                 context: {
-                    // Solo mandamos un texto para probar
-                    archivoNombre: "PRUEBA_CONEXION",
-                    nroFactura: "TEST-001"
+                    // Ajustado para coincidir exactamente con BPA
+                    "archivoNombre": req.data.nombre, // O el campo que recibas de la UI
+                    "contenido": req.data.monto      // O el contenido del archivo
                 }
-            };
-
-            console.log('>>> Intentando disparar BPA con datos de prueba...');
-            await bpa.post('/workflow-instances', payload);
-            console.log('>>> ¡CONEXIÓN EXITOSA! El mensaje llegó a BPA.');
-
+            });
+            return "Proceso iniciado con éxito";
         } catch (error) {
-            console.error('>>> ERROR DE CONEXIÓN:', error.message);
-            if (error.response) console.error('>>> Detalle:', error.response.data);
+            // Esto te ayudará a ver qué falló exactamente en la consola
+            console.error("Error detallado:", error);
+            req.error(500, `Error al conectar con BPA: ${error.message}`);
         }
     });
 });
